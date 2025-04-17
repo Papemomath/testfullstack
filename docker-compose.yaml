@@ -1,0 +1,55 @@
+services:
+  backend:
+    image: papemomath/atelier-backend:${BACKEND_VERSION}
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "8888:8888"
+    networks:
+      - pape-tp2
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/${DB_DATABASE}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+  frontend:
+    image: papemomath/atelier-frontend:${FRONTEND_VERSION}
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - pape-tp2
+
+  mariadb:
+    image: mariadb
+    container_name: mariadb 
+    networks: 
+      - pape-tp2
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - db:/var/lib/mysql
+      - ./db-seed/data.sql:/docker-entrypoint-initdb.d/data.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+
+
+volumes:
+  db:
+
+networks:
+  pape-tp2:
+    driver: bridge

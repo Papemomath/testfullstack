@@ -1,0 +1,19 @@
+.navbar2 a {
+    color: black;
+    font-weight: bold;
+    padding: 10px;
+    margin: 0;
+}   
+
+.navbar2 li {
+    padding: 0;
+    margin: 0;
+}
+
+.navbar2 a:hover {
+    color: blue;
+}
+
+.navbar2 a:focus {
+    color: blue;
+}
